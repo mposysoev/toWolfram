@@ -7,8 +7,8 @@ def main():
 
     with open(file_name, "r") as file:
         data = file.readline()
-        result = subprocess.run(["name-of-tool", data], capture_output=True)
-
+        execution = subprocess.run(["./tool.exe", data], capture_output=True)
+        result = execution.stdout.decode("utf-8")
     with open(f"{file_name}-out-tool.txt", "w") as output:
         print(result, file=output)
 

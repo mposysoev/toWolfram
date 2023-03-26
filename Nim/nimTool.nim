@@ -1,16 +1,16 @@
 import strutils, sequtils
+import os
 
-proc replace_function(big_string: string, replace_what: string, replace_with: string): string =
+proc replace_function(big_string: string, replace_what: string,
+    replace_with: string): string =
   # Replace all instances of "replace_what(" with "replace_with["
   let replace_what_len = replace_what.len + 1
-  replace_what = replace_what & "("
-  replace_with = replace_with & "["
+  let replace_what = replace_what & "("
+  let replace_with = replace_with & "["
   var index = 0
-  while true:
-    index = big_string.find(replace_what, index)
-    if index == -1: break
-    big_string.replace(index, replace_what_len, replace_with)
-  
+
+  var big_string = replace(big_string, replace_what, replace_with)
+
   # Add a closing bracket for each "replace_with[" expression
   let replace_with_len = replace_with.len
   index = 0
@@ -26,20 +26,24 @@ proc replace_function(big_string: string, replace_what: string, replace_with: st
       of ')':
         bracket_count -= 1
         if bracket_count == 0 and big_string[j] == ')':
-          big_string.replace(j, 1, "]")
+          big_string.delete(j, j)
+          big_string.insert("]", j)
+          # big_string.replace(j, 1, "]")
       else:
         discard
       j += 1
-    
+
     index = j
-  
+
   return big_string
 
 when isMainModule:
-  if paramCount() != 1:
-    echo "Usage:", getModuleName(), " <string>"
+
+  let argc = paramCount()
+  if argc != 1:
     quit 1
-  
-  let input_string = paramStr(1)
-  let result = replace_function(input_string, "sqrt", "Sqrt")
-  echo result
+  else:
+    let argv = commandLineParams()
+    let input_string = argv[0]
+    let result = replace_function(input_string, "sqrt", "Sqrt")
+    echo result
